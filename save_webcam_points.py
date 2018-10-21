@@ -1,3 +1,4 @@
+import json
 import argparse
 import logging
 import time
@@ -39,22 +40,20 @@ if __name__ == '__main__':
     else:
         e = TfPoseEstimator(get_graph_path(args.model), target_size=(432, 368))
     logger.debug('cam read+')
-    cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(args.camera)
     ret_val, image = cam.read()
     logger.info('cam image=%dx%d' % (image.shape[1], image.shape[0]))
-
+    
+    all_cords = []
     while True:
         ret_val, image = cam.read()
-        print('a')
-        width = cam.get(3)   # float
-        height = cam.get(4)
-        print(width, height)
-
+        print('aaaa', args.resize_out_ratio)
         logger.debug('image process+')
         humans = e.inference(image, resize_to_default=(w > 0 and h > 0), upsample_size=args.resize_out_ratio)
 
         logger.debug('postprocess+')
         image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
+        all_cords.append(TfPoseEstimator.get_cords(image, humans, imgcopy=False))
 
         logger.debug('show+')
         cv2.putText(image,
@@ -68,3 +67,5 @@ if __name__ == '__main__':
         logger.debug('finished+')
 
     cv2.destroyAllWindows()
+    with open('keypoint_cords.json', 'w+') as f:
+        json.dump(all_cords, f)

@@ -26,6 +26,25 @@ formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s] %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+part_name_arr = ['nose',
+    'neck',
+    'rshoulder',
+    'relbow',
+    'rwrist',
+    'lshoulder',
+    'lelbow',
+    'lwrist',
+    'rhip',
+    'rknee',
+    'rankle',
+    'lhip',
+    'lknee',
+    'lankle',
+    'reye',
+    'leye',
+    'rear',
+    'lear',
+    'background']
 
 def _round(v):
     return int(round(v))
@@ -376,6 +395,25 @@ class TfPoseEstimator:
         # npimg_q += 0.5
         npimg_q = npimg_q.astype(np.uint8)
         return npimg_q
+
+    @staticmethod
+    def get_cords(npimg, humans, imgcopy=False):
+        if imgcopy:
+            npimg = np.copy(npimg)
+        image_h, image_w = npimg.shape[:2]
+        centers = {}
+        cord_lists = []
+        for human in humans:
+            cord_lists.append({})
+            # draw point
+            for part_idx in range(common.CocoPart.Background.value):
+                if part_idx not in human.body_parts.keys():
+                    continue
+
+                body_part = human.body_parts[part_idx]
+                cord_lists[-1][part_name_arr[part_idx]] = [body_part.x, body_part.y]
+
+        return cord_lists
 
     @staticmethod
     def draw_humans(npimg, humans, imgcopy=False):

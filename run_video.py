@@ -21,7 +21,7 @@ fps_time = 0
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tf-pose-estimation Video')
-    parser.add_argument('--video', type=str, default='')
+    parser.add_argument('--video', type=str, default='video_test.mp4')
     parser.add_argument('--resolution', type=str, default='432x368', help='network input resolution. default=432x368')
     parser.add_argument('--model', type=str, default='mobilenet_thin', help='cmu / mobilenet_thin')
     parser.add_argument('--show-process', type=bool, default=False,
@@ -42,6 +42,7 @@ if __name__ == '__main__':
         humans = e.inference(image)
         if not args.showBG:
             image = np.zeros(image.shape)
+        print(humans)
         image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
 
         cv2.putText(image, "FPS: %f" % (1.0 / (time.time() - fps_time)), (10, 10),  cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
